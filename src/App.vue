@@ -1,5 +1,5 @@
 <template>
-  <Navbar :cart-total="cartTotal" :cart-qty="cartQty" />
+  <navbar :cart-total="cartTotal" :cart-qty="cartQty" />
   <div class="container">
     <router-view :products="products" :cart-total="cartTotal" />
   </div>
