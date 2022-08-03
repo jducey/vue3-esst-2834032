@@ -1,33 +1,33 @@
 <template>
-  <div class="dropdown-clip" v-if="cart.length > 0">
+  <div class="dropdown-clip">
     <transition name="dropdown">
       <div
         v-if="displayCart"
         class="list-group bg-white"
         aria-labelledby="cartDropdown"
       >
-        <div v-for="(item, index) in cart" :key="index">
+        <div v-for="(item, index) in navCart" :key="index">
           <div class="dropdown-item-text text-nowrap text-right align-middle">
-            <span class="badge bg-success align-text-top mr-1">
-              {{ item.qty }}</span
-            >
+            <span class="badge bg-success align-text-top mr-1">{{
+              item.qty
+            }}</span>
             {{ item.product.name }}
             <b>
-              <curr :amt="item.qty * Number(item.product.price)"></curr>
+              <curr :amt="item.qty * Number(item.product.price)" />
             </b>
             <button
-              @click.stop="this.$parent.$emit('deleteItem', index)"
+              @click.stop="deleteItem(index)"
               class="btn btn-sm btn-danger ml-2"
+              aria-label="delete item"
             >
-              -
+              <span aria-hidden="true">-</span>
             </button>
           </div>
         </div>
         <router-link
           to="/checkout"
           class="btn btn-sm btn-success text-white float-right mr-2 mt-2"
-        >
-          checkout</router-link
+          >checkout</router-link
         >
       </div>
     </transition>
@@ -35,13 +35,18 @@
 </template>
 
 <script>
-import Curr from '@/components/Curr'
+import { inject } from 'vue'
+import Curr from '@/components/Curr.vue'
+
 export default {
-  props: ['cart', 'displayCart'],
-  components: {
-    Curr
-  },
-  emits: ['deleteItem']
+  components: { Curr },
+  props: ['displayCart'],
+  setup() {
+    const navCart = inject('appCart', [])
+    const deleteItem = inject('deleteItem')
+
+    return { navCart, deleteItem }
+  }
 }
 </script>
 

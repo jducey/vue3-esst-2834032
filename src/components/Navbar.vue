@@ -1,16 +1,16 @@
 <template>
   <nav class="navbar navbar-light sticky-top mr-3">
     <div
-      v-if="cart.length"
-      class=" w-100 navbar-text ml-auto d-flex justify-content-end position-relative"
+      v-if="navCart.length"
+      class="w-100 navbar-text d-flex justify-content-end position-absolute top-0"
     >
       <div
-        class="mr-auto d-flex align-items-end flex-column bd-highlight mb-3 position-absolute"
+        class="bg-white d-flex align-items-end flex-column bd-highlight mb-3"
       >
         <div class="mb-2">
           <span class="font-weight-bold bg-white"
-            ><curr :amt="cartTotal"></curr
-          ></span>
+            ><curr :amt="cartTotal"
+          /></span>
           <button
             @click="toggleCartMenu"
             class="btn btn-sm btn-success ml-3"
@@ -18,30 +18,34 @@
             aria-haspopup="true"
             aria-expanded="false"
           >
-            <fa icon="shopping-cart" />
+            <fa icon="fa-shopping-cart mr-1" />
             {{ cartQty }}
           </button>
         </div>
-        <cart-dropdown :cart="cart" :displayCart="displayCart" />
+        <cart-dropdown :display-cart="displayCart" />
       </div>
     </div>
   </nav>
 </template>
 
 <script>
+import { inject } from 'vue'
 import Curr from '@/components/Curr'
 import CartDropdown from '@/components/CartDropdown'
+
 export default {
   data: function() {
     return {
       displayCart: false
     }
   },
-  props: ['cart', 'cartTotal', 'cartQty'],
-  components: {
-    Curr,
-    CartDropdown
+  setup() {
+    const navCart = inject('appCart', [])
+
+    return { navCart }
   },
+  components: { Curr, CartDropdown },
+  props: ['cartTotal', 'cartQty'],
   methods: {
     toggleCartMenu() {
       this.displayCart = !this.displayCart

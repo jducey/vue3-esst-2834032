@@ -13,8 +13,7 @@ export default {
   name: 'Home',
   data: function() {
     return {
-      max: 50,
-      cart: []
+      max: 50
     }
   },
   props: ['products'],

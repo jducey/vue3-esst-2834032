@@ -2,10 +2,10 @@
   <div class="container">
     <h1>Checkout</h1>
 
-    <table class="table table-hover">
+    <table class="table table-hover" v-if="checkoutCart.length">
       <caption class="text-right h3">
         <b>Total:</b>
-        Total
+        <curr :amt="cartTotal" />
       </caption>
       <thead>
         <tr>
@@ -17,36 +17,57 @@
         </tr>
       </thead>
       <tbody>
-        <tr>
+        <tr v-for="(item, index) in checkoutCart" :key="item.product.id">
           <td class="text-center">
             <div class="btn-group" role="group" aria-label="Basic example">
-              <button class="btn btn-success">
-                +
+              <button
+                @click="addItem(item.product)"
+                class="btn btn-success"
+                aria-label="add item"
+              >
+                <span aria-hidden="true">+</span>
               </button>
-              <button class="btn btn-outline-success">
-                -
+              <button
+                @click="deleteItem(index)"
+                class="btn btn-outline-success"
+                aria-label="delete item"
+              >
+                <span aria-hidden="true">-</span>
               </button>
             </div>
           </td>
-          <th scope="row">item name</th>
-          <td class="text-center">item qty</td>
+          <th scope="row">{{ item.product.name }}</th>
+          <td class="text-center">{{ item.qty }}</td>
           <td class="text-right">
-            price
+            <curr :amt="Number(item.product.price)" />
           </td>
           <td class="text-right">
-            subtotal
+            <curr :amt="item.qty * Number(item.product.price)" />
           </td>
         </tr>
       </tbody>
     </table>
-    <router-link class="btn btn-sm btn-success" to="/"
-      >Keep Shopping</router-link
-    >
-  </div></template
->
+    <router-link class="btn btn-sm btn-success" to="/">
+      Keep Shopping
+    </router-link>
+  </div>
+</template>
 
 <script>
-export default {}
+import { inject } from 'vue'
+import Curr from '@/components/Curr'
+
+export default {
+  components: { Curr },
+  props: ['cartTotal'],
+  setup() {
+    const checkoutCart = inject('appCart', [])
+    const addItem = inject('addItem')
+    const deleteItem = inject('deleteItem')
+
+    return { checkoutCart, addItem, deleteItem }
+  }
+}
 </script>
 
 <style></style>

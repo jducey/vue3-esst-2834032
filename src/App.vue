@@ -1,31 +1,22 @@
 <template>
-  <navbar
-    :cart="cart"
-    :cart-total="cartTotal"
-    :cart-qty="cartQty"
-    @delete-item="deleteItem"
-  />
+  <Navbar :cart-total="cartTotal" :cart-qty="cartQty" />
   <div class="container">
-    <router-view
-      :products="products"
-      :cart="cart"
-      @addItem="addItem"
-      @delete-item="deleteItem"
-    />
+    <router-view :products="products" :cart-total="cartTotal" />
   </div>
 </template>
 
 <script>
+import { provide, reactive } from 'vue'
 import Navbar from '@/components/Navbar'
+
 export default {
-  data: function() {
-    return {
-      cart: [],
-      products: []
-    }
-  },
   components: {
     Navbar
+  },
+  data: function() {
+    return {
+      products: []
+    }
   },
   created() {
     fetch('https://hplussport.com/api/products/order/price')
@@ -34,10 +25,12 @@ export default {
         this.products = data
       })
   },
-  methods: {
-    addItem(product) {
+  setup() {
+    const cart = reactive([])
+
+    function addItem(product) {
       let whichProduct
-      let existing = this.cart.filter(function(item, index) {
+      let existing = cart.filter(function(item, index) {
         if (item.product.id == Number(product.id)) {
           whichProduct = index
           return true
@@ -47,17 +40,28 @@ export default {
       })
 
       if (existing.length) {
-        this.cart[whichProduct].qty++
+        cart[whichProduct].qty++
       } else {
-        this.cart.push({ product: product, qty: 1 })
+        cart.push({ product: product, qty: 1 })
       }
-    },
-    deleteItem: function(id) {
-      if (this.cart[id].qty > 1) {
-        this.cart[id].qty--
+    }
+
+    function deleteItem(id) {
+      if (cart[id].qty > 1) {
+        cart[id].qty--
       } else {
-        this.cart.splice(id, 1)
+        cart.splice(id, 1)
       }
+    }
+
+    provide('appCart', cart)
+    provide('addItem', addItem)
+    provide('deleteItem', deleteItem)
+
+    return {
+      cart,
+      addItem,
+      deleteItem
     }
   },
   computed: {
@@ -66,9 +70,10 @@ export default {
       for (let key in this.cart) {
         sum = sum + this.cart[key].product.price * this.cart[key].qty
       }
+      Number(sum)
       return sum
     },
-    cartQty: function() {
+    cartQty() {
       let qty = 0
       for (let key in this.cart) {
         qty = qty + this.cart[key].qty
